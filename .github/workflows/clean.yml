@@ -1,4 +1,4 @@
-name: Run Terraform with OpenID Connect
+name: Destroy infra with OpenID Connect
 on: 
   workflow_dispatch:
 
