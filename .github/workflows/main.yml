@@ -56,7 +56,7 @@ jobs:
       run: terraform plan -no-color -input=false -var "resource_group_name=${{secrets.AZURE_RESOURCE_GROUP_NAME}}"
       continue-on-error: true
       
-    - name: Update Pull Request
+    - name: check plan
       uses: actions/github-script@v6
       env:
         PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
@@ -77,13 +77,6 @@ jobs:
           </details>
 
           *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: output
-          })
     - name: Terraform Plan Status
       if: steps.plan.outcome == 'failure'
       run: exit 1
