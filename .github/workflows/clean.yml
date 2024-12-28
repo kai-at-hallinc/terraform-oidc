@@ -8,7 +8,7 @@ permissions:
       pull-requests: write
       
 jobs:
-  clena the environment:
+  clean:
     defaults:
       run:
         working-directory: ./terraform-example-deploy
