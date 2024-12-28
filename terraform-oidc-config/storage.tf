@@ -1,21 +1,19 @@
-resource "azurerm_storage_account" "example" {
+resource "azurerm_storage_account" "tfstate" {
   name                     = "${lower(replace(var.prefix, "-", ""))}tfstate"
-  resource_group_name      = azurerm_resource_group.state.name
+  resource_group_name      = azurerm_resource_group.dev.name
   location                 = var.location
   account_tier             = "Standard"
-  account_replication_type = "GRS"
+  account_replication_type = "LRS"
 }
 
-resource "azurerm_storage_container" "example" {
-  for_each              = { for env in var.environments : env => env }
-  name                  = each.value
-  storage_account_name  = azurerm_storage_account.example.name
+resource "azurerm_storage_container" "tfstate" {
+  name                  = var.tfcontainer
+  storage_account_name  = azurerm_storage_account.tfstate.name
   container_access_type = "private"
 }
 
 resource "azurerm_role_assignment" "storage_container" {
-  for_each             = { for env in var.environments : env => env }
-  scope                = azurerm_storage_container.example[each.value].resource_manager_id
-  role_definition_name = "Storage Blob Data Owner"
-  principal_id         = var.use_managed_identity ? azurerm_user_assigned_identity.example[each.value].principal_id : azuread_service_principal.github_oidc[each.value].id
+  scope                = azurerm_storage_container.tfstate.resource_manager_id
+  role_definition_name = "Storage Blob Contributor"
+  principal_id         = azurerm_user_assigned_identity.oidc.principal_id
 }
